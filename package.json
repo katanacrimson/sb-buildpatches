@@ -1,0 +1,28 @@
+{
+  "name": "sb-buildpatches",
+  "version": "1.0.0",
+  "description": "Starbound mod build helper - builds patch files from changed files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/damianb/sb-buildpatches.git"
+  },
+  "keywords": [
+    "starbound"
+  ],
+  "author": "Damian Bushong <katana@odios.us>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/damianb/sb-buildpatches/issues"
+  },
+  "homepage": "https://github.com/damianb/sb-buildpatches#readme",
+  "dependencies": {
+    "fast-json-patch": "^1.1.9",
+    "fs-extra": "^2.1.2",
+    "mkdirp": "^0.5.1",
+    "recursive-readdir": "^2.1.1"
+  }
+}
