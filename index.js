@@ -31,16 +31,21 @@ module.exports = function(options) {
 
 	// these should let us ignore files that can't be JSON-patched.
 	let ignoredExtensions = [
-		'*.disabled', // ignored for now. @todo: reconsider?
-		'*.objectdisabled',  // ignored for now. @todo: reconsider?
-		'*.md',
-		'*.png',
-		'*.wav',
-		'*.ogg',
-		'*.ttf',
-		'*.lua',
-		'*.txt',
-		'*.ase' // no idea why an ASE file is in the Starbound assets... 
+		// .disabled and .objectdisabled exist in the Starbound asset files
+		//   we're ignoring them for now, because we probably shouldn't be JSON patching a disabled file o_O
+		'.disabled', // ignored for now. @todo: reconsider?
+		'.objectdisabled',  // ignored for now. @todo: reconsider?
+		'.ase' // no idea why an ASE file is in the Starbound assets...lol Chucklefish.
+	]
+	
+	let unpatchableExtensions = [
+		'.md',
+		'.png',
+		'.wav',
+		'.ogg',
+		'.ttf',
+		'.lua',
+		'.txt'
 	]
 
 	r_readdir(options.workingDir, ignoredExtensions, function(err, files) {
@@ -59,6 +64,19 @@ module.exports = function(options) {
 			assetFilepath = path.join(options.starboundAssets, relFilepath)
 			destFilepath = path.join(options.dest, relFilepath)
 
+			// files with these extensions are not candidates for JSON patching, and must be hand copied.
+			if(unpatchableExtensions.includes(path.extname(filePath))) {
+				try {
+					fs.copySync(filePath, destFilepath, { overwrite: true })
+				} catch(err) {
+					console.log('failed to copy mod file to ' + destFilepath)
+					return
+				}
+				console.log('copied mod file to ' + destFilepath)
+				return
+			}
+
+			// files that fall into this case are newly introduced and should not be JSON patched (it wouldn't make sense)
 			try {
 				fs.accessSync(assetFilepath, fs.constants.R_OK)
 			} catch(err) {
@@ -76,6 +94,7 @@ module.exports = function(options) {
 				return
 			}
 
+			// from this point on, this file will *be* a JSON patch file
 			destFilepath += '.patch'
 			let originalFile = null,
 				modifiedFile = null
@@ -92,6 +111,7 @@ module.exports = function(options) {
 				return
 			}
 
+			// create and write the patch file
 			let diff = patch.compare(originalFile, modifiedFile)
 			try {
 				fs.outputJsonSync(destFilepath, diff, { replacer: "\t" })
