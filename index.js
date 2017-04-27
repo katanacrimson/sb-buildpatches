@@ -11,6 +11,7 @@
 
 let r_readdir = require('recursive-readdir')
 let patch = require('fast-json-patch')
+let stripComments = require('strip-json-comments')
 let path = require('path')
 let fs = require('fs-extra')
 
@@ -99,13 +100,13 @@ module.exports = function(options) {
 			let originalFile = null,
 				modifiedFile = null
 			try {
-				originalFile = fs.readJsonSync(assetFilepath)
+				originalFile = JSON.parse(stripComments(fs.readSync(assetFilepath)))
 			} catch(err) {
 				console.log('failed to load ' + relFilepath + ' from Starbound asset files')
 				return
 			}
 			try {
-				modifiedFile = fs.readJsonSync(filePath)
+				modifiedFile = JSON.parse(stripComments(fs.readSync(filePath)))
 			} catch(err) {
 				console.log('failed to parse ' + filePath + ' from modded asset files')
 				return
