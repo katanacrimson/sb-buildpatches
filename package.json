@@ -1,6 +1,6 @@
 {
   "name": "sb-buildpatches",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Starbound mod build helper - builds patch files from changed files",
   "main": "index.js",
   "scripts": {
