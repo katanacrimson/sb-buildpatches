@@ -100,13 +100,13 @@ module.exports = function(options) {
 			let originalFile = null,
 				modifiedFile = null
 			try {
-				originalFile = JSON.parse(stripComments(fs.readSync(assetFilepath)))
+				originalFile = JSON.parse(stripComments(fs.readFileSync(assetFilepath, "utf8")))
 			} catch(err) {
 				console.log('failed to load ' + relFilepath + ' from Starbound asset files')
 				return
 			}
 			try {
-				modifiedFile = JSON.parse(stripComments(fs.readSync(filePath)))
+				modifiedFile = JSON.parse(stripComments(fs.readFileSync(assetFilepath, "utf8")))
 			} catch(err) {
 				console.log('failed to parse ' + filePath + ' from modded asset files')
 				return
