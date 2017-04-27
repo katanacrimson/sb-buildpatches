@@ -106,9 +106,9 @@ module.exports = function(options) {
 				return
 			}
 			try {
-				modifiedFile = JSON.parse(stripComments(fs.readFileSync(assetFilepath, "utf8")))
+				modifiedFile = JSON.parse(stripComments(fs.readFileSync(filePath, "utf8")))
 			} catch(err) {
-				console.log('failed to parse ' + filePath + ' from modded asset files')
+				console.log('failed to load ' + filePath + ' from modded asset files')
 				return
 			}
 
