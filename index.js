@@ -15,7 +15,7 @@ let stripComments = require('strip-json-comments')
 let path = require('path')
 let fs = require('fs-extra')
 
-module.exports = function(options) {
+module.exports = function(options, callback) {
 	if(!options.workingDir) {
 		throw new Error('working directory for mod MUST be specified')
 	}
@@ -38,19 +38,31 @@ module.exports = function(options) {
 		'.objectdisabled',  // ignored for now. @todo: reconsider?
 		'.ase' // no idea why an ASE file is in the Starbound assets...lol Chucklefish.
 	]
-	
+
 	let unpatchableExtensions = [
 		'.md',
 		'.png',
+		'.PNG',
 		'.wav',
 		'.ogg',
 		'.ttf',
 		'.lua',
-		'.txt'
+		'.txt',
+		'*.psd',
+		'*.pdn',
+		'*.broken',
+		'*.db',
+		'_metadata',
+		'.metadata',
+		'.gitignore',
+		'.git',
+		'_previewimage'
 	]
 
 	r_readdir(options.workingDir, ignoredExtensions, function(err, files) {
 		if(err) throw err
+
+		let errored = false
 		files.forEach(function(filePath) {
 			let relFilepath = '',
 				assetFilepath = '',
@@ -70,7 +82,8 @@ module.exports = function(options) {
 				try {
 					fs.copySync(filePath, destFilepath, { overwrite: true })
 				} catch(err) {
-					console.log('failed to copy mod file to ' + destFilepath)
+					console.error('failed to copy mod file to ' + destFilepath)
+					errored = true
 					return
 				}
 				console.log('copied mod file to ' + destFilepath)
@@ -88,7 +101,8 @@ module.exports = function(options) {
 				try {
 					fs.copySync(filePath, destFilepath, { overwrite: true })
 				} catch(err) {
-					console.log('failed to copy mod file to ' + destFilepath)
+					console.error('failed to copy mod file to ' + destFilepath)
+					errored = true
 					return
 				}
 				console.log('sucessfully copied mod file to ' + destFilepath)
@@ -102,13 +116,15 @@ module.exports = function(options) {
 			try {
 				originalFile = JSON.parse(stripComments(fs.readFileSync(assetFilepath, "utf8")))
 			} catch(err) {
-				console.log('failed to load ' + relFilepath + ' from Starbound asset files')
+				console.error('failed to load ' + relFilepath + ' from Starbound asset files')
+				errored = true
 				return
 			}
 			try {
 				modifiedFile = JSON.parse(stripComments(fs.readFileSync(filePath, "utf8")))
 			} catch(err) {
-				console.log('failed to load ' + filePath + ' from modded asset files')
+				console.error('failed to load ' + filePath + ' from modded asset files')
+				errored = true
 				return
 			}
 
@@ -117,10 +133,25 @@ module.exports = function(options) {
 			try {
 				fs.outputJsonSync(destFilepath, diff, { replacer: "\t" })
 			} catch(err) {
-				console.log('failed to write mod patch file to ' + destFilepath + ' from modded asset files as JSON')
+				console.error('failed to write mod patch file to ' + destFilepath + ' from modded asset files as JSON')
+				errored = true
 				return
 			}
 			console.log('successfully created mod patch file at ' + destFilepath)
 		})
+
+		if(errored) {
+			if(!!callback) {
+				callback(true)
+			} else {
+				process.exit(1)
+			}
+		} else {
+			if(!!callback) {
+				callback()
+			} else {
+				process.exit()
+			}
+		}
 	})
 }
