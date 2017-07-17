@@ -34,9 +34,9 @@ module.exports = function(options, callback) {
 	let ignoredExtensions = [
 		// .disabled and .objectdisabled exist in the Starbound asset files
 		//   we're ignoring them for now, because we probably shouldn't be JSON patching a disabled file o_O
-		'.disabled', // ignored for now. @todo: reconsider?
-		'.objectdisabled',  // ignored for now. @todo: reconsider?
-		'.ase' // no idea why an ASE file is in the Starbound assets...lol Chucklefish.
+		'*.disabled', // ignored for now. @todo: reconsider?
+		'*.objectdisabled',  // ignored for now. @todo: reconsider?
+		'*.ase' // no idea why an ASE file is in the Starbound assets...lol Chucklefish.
 	]
 
 	let unpatchableExtensions = [
