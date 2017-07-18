@@ -11,6 +11,7 @@
 
 let r_readdir = require('recursive-readdir')
 let patch = require('fast-json-patch')
+let replace = require('replace-in-file')
 let stripComments = require('strip-json-comments')
 let path = require('path')
 let fs = require('fs-extra')
@@ -40,14 +41,14 @@ module.exports = function(options, callback) {
 	]
 
 	let unpatchableExtensions = [
-		'.md',
-		'.png',
-		'.PNG',
-		'.wav',
-		'.ogg',
-		'.ttf',
-		'.lua',
-		'.txt',
+		'*.md',
+		'*.png',
+		'*.PNG',
+		'*.wav',
+		'*.ogg',
+		'*.ttf',
+		'*.lua',
+		'*.txt',
 		'*.psd',
 		'*.pdn',
 		'*.broken',
@@ -131,9 +132,16 @@ module.exports = function(options, callback) {
 			// create and write the patch file
 			let diff = patch.compare(originalFile, modifiedFile)
 			try {
-				fs.outputJsonSync(destFilepath, diff, { replacer: "\t" })
+				fs.outputJsonSync(destFilepath, diff, { spaces: "\t" })
+				// because JSON.serialize outputs \n EOL, we have to change it afterward...
+				replace.sync({
+					files: destFilepath,
+					find: "\n",
+					replace: "\r\n",
+					encoding: 'utf8'
+				})
 			} catch(err) {
-				console.error('failed to write mod patch file to ' + destFilepath + ' from modded asset files as JSON')
+				console.error('failed to write mod patch file to ' + destFilepath)
 				errored = true
 				return
 			}
