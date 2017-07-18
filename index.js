@@ -136,8 +136,8 @@ module.exports = function(options, callback) {
 				// because JSON.serialize outputs \n EOL, we have to change it afterward...
 				replace.sync({
 					files: destFilepath,
-					find: "\n",
-					replace: "\r\n",
+					from: "\n",
+					to: "\r\n",
 					encoding: 'utf8'
 				})
 			} catch(err) {
